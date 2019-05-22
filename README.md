@@ -5,6 +5,8 @@
 [![NPM Version][npm-image]][npm-url]
 [![Downloads Stats][npm-downloads]][npm-url]
 
+##### [Docs][docs]
+
 This mission-control-client is used to simplify my custom applications that I write for the Mission Control home automation system.
 This library makes it very easy to add features to every little thing I built for it.
 
