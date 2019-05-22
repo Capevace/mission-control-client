@@ -85,3 +85,4 @@ Some acknowledgements.
 [npm-url]: https://npmjs.org/package/mission-control-client
 [npm-downloads]: https://img.shields.io/npm/dm/mission-control-client.svg?style=flat-square
 [wiki]: https://github.com/capevace/mission-control-client/wiki
+[docs]: https://capevace.github.io/mission-control-client

@@ -29,7 +29,20 @@
     "destination": "./docs",
     "plugins": [
       {
-        "name": "esdoc-standard-plugin"
+        "name": "esdoc-standard-plugin",
+        "option": {
+          "lint": {
+            "enable": true
+          },
+          "coverage": {
+            "enable": true
+          },
+          "brand": {
+            "title": "Mission Control Client",
+            "description": "A client for Node.js and the browser to easily connect and interact with the Mission Control system.",
+            "author": "https://twitter.com/capevace/"
+          }
+        }
       }
     ]
   }
