@@ -55,7 +55,7 @@ Describe how to install all development dependencies and how to run an automated
 npm run docs
 
 # To build
-npm build
+npm run build
 ```
 
 ## Release History

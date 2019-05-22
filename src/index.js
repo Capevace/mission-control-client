@@ -65,6 +65,10 @@ export class MissionControlClient {
 	 */
 	constructor(url, authToken) {
 		/**
+		 * The socket.io socket used for the communication.
+		 *
+		 * While it is possible it is recommended not to use this variable directly and to use the exposed {@link MissionControlClient#action} and {@link MissionControlClient#subscribe} methods instead.
+		 *
 		 * @type socket.io-client~Socket
 		 * @since 1.0.0
 		 */
@@ -73,6 +77,10 @@ export class MissionControlClient {
 		});
 
 		/**
+		 * The event bus used to communicate events within the client.
+		 *
+		 * While it is possible it is recommended not to use this variable directly and to use the exposed {@link MissionControlClient#on} and {@link MissionControlClient#subscribe} methods instead.
+		 *
 		 * @type socket.io-client~Nanobus
 		 * @emits {SocketEvent}
 		 * @since 1.0.0

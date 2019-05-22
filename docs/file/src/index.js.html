@@ -29,10 +29,7 @@
 <nav class="navigation" data-ice="nav"><div>
   <ul>
     
-  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/index.js~MissionControlClient.html">MissionControlClient</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DISCONNECT_REASON">DISCONNECT_REASON</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-SOCKET_ERROR">SOCKET_ERROR</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-SocketEvents">SocketEvents</a></span></span></li>
+  <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-SocketEvents">SocketEvents</a></span></span></li>
 </ul>
 </div>
 </nav>
@@ -50,7 +47,7 @@ const nanobus = require(&apos;nanobus&apos;)();
  * @property {string} AUTH_FAILED The client is not granted access to the server.
  * @since 1.0.0
  */
-export const SOCKET_ERROR = {
+const SOCKET_ERROR = {
 	GENERAL: &apos;GENERAL&apos;,
 	TIMEOUT: &apos;TIMEOUT&apos;,
 	NO_ATTEMPTS_LEFT: &apos;NO_ATTEMPTS_LEFT&apos;,
@@ -66,7 +63,7 @@ export const SOCKET_ERROR = {
  * @property {string} PING_TIMEOUT The ping to the server timed-out. The client will automatically try to reconnect.
  * @since 1.0.0
  */
-export const DISCONNECT_REASON = {
+const DISCONNECT_REASON = {
 	UNKNOWN: &apos;UNKNOWN&apos;,
 	SERVER_DISCONNECT: &apos;SERVER_DISCONNECT&apos;,
 	CLIENT_DISCONNECT: &apos;CLIENT_DISCONNECT&apos;,
@@ -95,7 +92,7 @@ export const DISCONNECT_REASON = {
  * @since 1.0.0
  * @emits {connect} emit event when bar.
  */
-export class MissionControlClient {
+class MissionControlClient {
 	/**
 	 * The MissionControlClient constructor.
 	 *
@@ -105,6 +102,10 @@ export class MissionControlClient {
 	 */
 	constructor(url, authToken) {
 		/**
+		 * The socket.io socket used for the communication.
+		 *
+		 * While it is possible it is recommended not to use this variable directly and to use the exposed {@link MissionControlClient#action} and {@link MissionControlClient#subscribe} methods instead.
+		 *
 		 * @type socket.io-client~Socket
 		 * @since 1.0.0
 		 */
@@ -113,6 +114,10 @@ export class MissionControlClient {
 		});
 
 		/**
+		 * The event bus used to communicate events within the client.
+		 *
+		 * While it is possible it is recommended not to use this variable directly and to use the exposed {@link MissionControlClient#on} and {@link MissionControlClient#subscribe} methods instead.
+		 *
 		 * @type socket.io-client~Nanobus
 		 * @emits {SocketEvent}
 		 * @since 1.0.0
@@ -313,6 +318,12 @@ export class MissionControlClient {
 		this.socket.emit(&apos;action&apos;, { action, data });
 	}
 }
+
+module.exports = {
+	MissionControlClient,
+	SOCKET_ERROR,
+	DISCONNECT_REASON
+};
 </code></pre>
 
 </div>
