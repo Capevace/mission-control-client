@@ -1,11 +1,11 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(factory((global.missionControlClient = {})));
-}(this, (function (exports) {
-	var socketIO = require('socket.io-client');
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('socket.io-client'), require('nanobus')) :
+	typeof define === 'function' && define.amd ? define(['exports', 'socket.io-client', 'nanobus'], factory) :
+	(factory((global.missionControlClient = {}),global.socketIO,global.nanobus));
+}(this, (function (exports,socketIO,nanobus) {
+	socketIO = socketIO && socketIO.hasOwnProperty('default') ? socketIO['default'] : socketIO;
+	nanobus = nanobus && nanobus.hasOwnProperty('default') ? nanobus['default'] : nanobus;
 
-	var nanobus = require('nanobus')();
 	/**
 	 * The error types that cause the {@link SocketEvents} 'error' event to fire.
 	 * @type {Object} SOCKET_ERROR
@@ -16,12 +16,10 @@
 	 * @since 1.0.0
 	 */
 
-
 	var SOCKET_ERROR = {
 	  GENERAL: 'GENERAL',
 	  TIMEOUT: 'TIMEOUT',
-	  NO_ATTEMPTS_LEFT: 'NO_ATTEMPTS_LEFT',
-	  AUTH_FAILED: 'AUTH_FAILED'
+	  NO_ATTEMPTS_LEFT: 'NO_ATTEMPTS_LEFT'
 	};
 	/**
 	 * The disconnect reason that gets passed along with the {@link SocketEvents} 'disconnect' event.
@@ -63,6 +61,9 @@
 	 */
 
 	var MissionControlClient = function MissionControlClient(url, authToken) {
+	  // URL and auth token are required parameters.
+	  if (!url) { throw new Error('You need to pass an URL.'); }
+	  if (!authToken) { throw new Error('You need to pass an Auth Token.'); }
 	  /**
 	   * The socket.io socket used for the communication.
 	   *
@@ -71,6 +72,7 @@
 	   * @type socket.io-client~Socket
 	   * @since 1.0.0
 	   */
+
 	  this.socket = socketIO(url, {
 	    query: {
 	      token: authToken
@@ -109,9 +111,41 @@
 	MissionControlClient.prototype._setupSocketHandlers = function _setupSocketHandlers () {
 	    var this$1 = this;
 
-	  // On successful connection
+	  // We hijack the on event method to call it again with the '*' event which now gets called on
+	  // any event.
+	  var socketOnEvent = this.socket.onevent;
+
+	  this.socket.onevent = function (packet) {
+	    var args = packet.data || [];
+	    socketOnEvent.call(this, packet);
+	    packet.data = ['*'].concat(args);
+	    socketOnEvent.call(this, packet); // additional call for "*" event
+	  }; // This catches all other events and published them to our event bus
+
+
+	  this.socket.on('*', function (event) {
+	      var ref;
+
+	      var args = [], len = arguments.length - 1;
+	      while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
+	    (ref = this$1.eventBus).emit.apply(ref, [ event ].concat( args ));
+	  }); // On successful connection
+
 	  this.socket.on('connect', function () {
-	    cleanSubscriptions();
+	    // While we still have events to subscribe to, do so on connect
+	    while (this$1._subscribeTo.length > 0) {
+	      this$1.socket.emit('subscribe', {
+	        event: this$1._subscribeTo.shift()
+	      });
+	    } // While we still have events to unsubscribe from, do so on connect
+
+
+	    while (this$1._unsubscribeFrom.length > 0) {
+	      this$1.socket.emit('unsubscribe', {
+	        event: this$1._unsubscribeFrom.shift()
+	      });
+	    }
+
 	    this$1.eventBus.emit('connect');
 	  }); // On disconnect from server, reason can either be server disconnect, client disconnect or ping timeout.
 
@@ -243,14 +277,14 @@
 
 	  this.socket.on(serverEvent, listener);
 
-	  if (!(serverEvent in this.subscriptions)) {
+	  if (!(serverEvent in this._subscriptions)) {
 	    if (this.socket.connected) {
 	      this.socket.emit('subscribe', {
 	        event: serverEvent
 	      });
-	      this.subscriptions[serverEvent] = 1;
+	      this._subscriptions[serverEvent] = 1;
 	    } else {
-	      this.subscribeTo.push(serverEvent);
+	      this._subscribeTo.push(serverEvent);
 	    }
 	  }
 
@@ -258,16 +292,16 @@
 	    this$1.socket.removeListener(serverEvent, listener);
 
 	    if (this$1.socket.connected) {
-	      this$1.subscriptions[serverEvent]--;
+	      this$1._subscriptions[serverEvent]--;
 
-	      if (this$1.subscriptions[serverEvent] === 0) {
-	        delete this$1.subscriptions[serverEvent];
+	      if (this$1._subscriptions[serverEvent] === 0) {
+	        delete this$1._subscriptions[serverEvent];
 	        this$1.socket.emit('unsubscribe', {
 	          event: serverEvent
 	        });
 	      }
 	    } else {
-	      this$1.unsubscribeFrom.push(serverEvent);
+	      this$1._unsubscribeFrom.push(serverEvent);
 	    }
 	  };
 	};

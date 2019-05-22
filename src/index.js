@@ -1,5 +1,5 @@
-const socketIO = require('socket.io-client');
-const nanobus = require('nanobus')();
+import socketIO from 'socket.io-client';
+import nanobus from 'nanobus';
 
 /**
  * The error types that cause the {@link SocketEvents} 'error' event to fire.
@@ -13,8 +13,7 @@ const nanobus = require('nanobus')();
 export const SOCKET_ERROR = {
 	GENERAL: 'GENERAL',
 	TIMEOUT: 'TIMEOUT',
-	NO_ATTEMPTS_LEFT: 'NO_ATTEMPTS_LEFT',
-	AUTH_FAILED: 'AUTH_FAILED'
+	NO_ATTEMPTS_LEFT: 'NO_ATTEMPTS_LEFT'
 };
 
 /**
@@ -64,6 +63,10 @@ export class MissionControlClient {
 	 * @param {string} authToken - The JWT authentication token that should be used to authenticate.
 	 */
 	constructor(url, authToken) {
+		// URL and auth token are required parameters.
+		if (!url) throw new Error('You need to pass an URL.');
+		if (!authToken) throw new Error('You need to pass an Auth Token.');
+
 		/**
 		 * The socket.io socket used for the communication.
 		 *
@@ -103,9 +106,37 @@ export class MissionControlClient {
 	 * Job of this function is to unify all error events into a shape that makes more sense. See {@link SOCKET_ERROR} for the possible errors.
 	 */
 	_setupSocketHandlers() {
+		// We hijack the on event method to call it again with the '*' event which now gets called on
+		// any event.
+		const socketOnEvent = this.socket.onevent;
+		this.socket.onevent = function(packet) {
+			const args = packet.data || [];
+			socketOnEvent.call(this, packet);
+
+			packet.data = ['*'].concat(args);
+			socketOnEvent.call(this, packet); // additional call for "*" event
+		};
+
+		// This catches all other events and published them to our event bus
+		this.socket.on('*', (event, ...args) => {
+			this.eventBus.emit(event, ...args);
+		});
+
 		// On successful connection
 		this.socket.on('connect', () => {
-			cleanSubscriptions();
+			// While we still have events to subscribe to, do so on connect
+			while (this._subscribeTo.length > 0) {
+				this.socket.emit('subscribe', {
+					event: this._subscribeTo.shift()
+				});
+			}
+
+			// While we still have events to unsubscribe from, do so on connect
+			while (this._unsubscribeFrom.length > 0) {
+				this.socket.emit('unsubscribe', {
+					event: this._unsubscribeFrom.shift()
+				});
+			}
 
 			this.eventBus.emit('connect');
 		});
@@ -233,14 +264,14 @@ export class MissionControlClient {
 	subscribe(serverEvent, listener) {
 		this.socket.on(serverEvent, listener);
 
-		if (!(serverEvent in this.subscriptions)) {
+		if (!(serverEvent in this._subscriptions)) {
 			if (this.socket.connected) {
 				this.socket.emit('subscribe', {
 					event: serverEvent
 				});
-				this.subscriptions[serverEvent] = 1;
+				this._subscriptions[serverEvent] = 1;
 			} else {
-				this.subscribeTo.push(serverEvent);
+				this._subscribeTo.push(serverEvent);
 			}
 		}
 
@@ -248,17 +279,17 @@ export class MissionControlClient {
 			this.socket.removeListener(serverEvent, listener);
 
 			if (this.socket.connected) {
-				this.subscriptions[serverEvent]--;
+				this._subscriptions[serverEvent]--;
 
-				if (this.subscriptions[serverEvent] === 0) {
-					delete this.subscriptions[serverEvent];
+				if (this._subscriptions[serverEvent] === 0) {
+					delete this._subscriptions[serverEvent];
 
 					this.socket.emit('unsubscribe', {
 						event: serverEvent
 					});
 				}
 			} else {
-				this.unsubscribeFrom.push(serverEvent);
+				this._unsubscribeFrom.push(serverEvent);
 			}
 		};
 	}

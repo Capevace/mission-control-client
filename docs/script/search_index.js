@@ -1,5 +1,23 @@
 window.esdocSearchIndex = [
   [
+    "mission-control-client/src/index.js~disconnect_reason",
+    "variable/index.html#static-variable-DISCONNECT_REASON",
+    "<span>DISCONNECT_REASON</span> <span class=\"search-result-import-path\">mission-control-client/src/index.js</span>",
+    "variable"
+  ],
+  [
+    "mission-control-client/src/index.js~missioncontrolclient",
+    "class/src/index.js~MissionControlClient.html",
+    "<span>MissionControlClient</span> <span class=\"search-result-import-path\">mission-control-client/src/index.js</span>",
+    "class"
+  ],
+  [
+    "mission-control-client/src/index.js~socket_error",
+    "variable/index.html#static-variable-SOCKET_ERROR",
+    "<span>SOCKET_ERROR</span> <span class=\"search-result-import-path\">mission-control-client/src/index.js</span>",
+    "variable"
+  ],
+  [
     "src/.external-ecmascript.js~array",
     "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array",
     "src/.external-ecmascript.js~Array",
@@ -286,6 +304,72 @@ window.esdocSearchIndex = [
     "file/src/index.js.html",
     "src/index.js",
     "file"
+  ],
+  [
+    "src/index.js~missioncontrolclient#_setupsockethandlers",
+    "class/src/index.js~MissionControlClient.html#instance-method-_setupSocketHandlers",
+    "src/index.js~MissionControlClient#_setupSocketHandlers",
+    "method"
+  ],
+  [
+    "src/index.js~missioncontrolclient#_subscribeto",
+    "class/src/index.js~MissionControlClient.html#instance-member-_subscribeTo",
+    "src/index.js~MissionControlClient#_subscribeTo",
+    "member"
+  ],
+  [
+    "src/index.js~missioncontrolclient#_subscriptions",
+    "class/src/index.js~MissionControlClient.html#instance-member-_subscriptions",
+    "src/index.js~MissionControlClient#_subscriptions",
+    "member"
+  ],
+  [
+    "src/index.js~missioncontrolclient#_unsubscribefrom",
+    "class/src/index.js~MissionControlClient.html#instance-member-_unsubscribeFrom",
+    "src/index.js~MissionControlClient#_unsubscribeFrom",
+    "member"
+  ],
+  [
+    "src/index.js~missioncontrolclient#action",
+    "class/src/index.js~MissionControlClient.html#instance-method-action",
+    "src/index.js~MissionControlClient#action",
+    "method"
+  ],
+  [
+    "src/index.js~missioncontrolclient#constructor",
+    "class/src/index.js~MissionControlClient.html#instance-constructor-constructor",
+    "src/index.js~MissionControlClient#constructor",
+    "method"
+  ],
+  [
+    "src/index.js~missioncontrolclient#eventbus",
+    "class/src/index.js~MissionControlClient.html#instance-member-eventBus",
+    "src/index.js~MissionControlClient#eventBus",
+    "member"
+  ],
+  [
+    "src/index.js~missioncontrolclient#on",
+    "class/src/index.js~MissionControlClient.html#instance-method-on",
+    "src/index.js~MissionControlClient#on",
+    "method"
+  ],
+  [
+    "src/index.js~missioncontrolclient#once",
+    "class/src/index.js~MissionControlClient.html#instance-method-once",
+    "src/index.js~MissionControlClient#once",
+    "method"
+  ],
+  [
+    "src/index.js~missioncontrolclient#socket",
+    "class/src/index.js~MissionControlClient.html#instance-member-socket",
+    "src/index.js~MissionControlClient#socket",
+    "member"
+  ],
+  [
+    "src/index.js~missioncontrolclient#subscribe",
+    "class/src/index.js~MissionControlClient.html#instance-method-subscribe",
+    "src/index.js~MissionControlClient#subscribe",
+    "method"
   ],
   [
     "src/index.js~socketevents",

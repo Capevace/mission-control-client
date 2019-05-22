@@ -8,7 +8,7 @@
   "unpkg": "dist/index.umd.js",
   "scripts": {
     "docs": "./node_modules/.bin/esdoc",
-    "build": "microbundle --target node --no-compress"
+    "build": "./node_modules/.bin/microbundle --target node --no-compress"
   },
   "repository": {
     "type": "git",
@@ -26,8 +26,8 @@
   },
   "devDependencies": {
     "esdoc": "^1.1.0",
-    "esdoc-node": "^1.0.4",
-    "esdoc-standard-plugin": "^1.0.0"
+    "esdoc-standard-plugin": "^1.0.0",
+    "microbundle": "^0.11.0"
   },
   "esdoc": {
     "source": "./src",

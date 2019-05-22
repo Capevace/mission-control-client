@@ -29,14 +29,17 @@
 <nav class="navigation" data-ice="nav"><div>
   <ul>
     
-  <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-SocketEvents">SocketEvents</a></span></span></li>
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/index.js~MissionControlClient.html">MissionControlClient</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DISCONNECT_REASON">DISCONNECT_REASON</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-SOCKET_ERROR">SOCKET_ERROR</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-SocketEvents">SocketEvents</a></span></span></li>
 </ul>
 </div>
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/index.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">const socketIO = require(&apos;socket.io-client&apos;);
-const nanobus = require(&apos;nanobus&apos;)();
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import socketIO from &apos;socket.io-client&apos;;
+import nanobus from &apos;nanobus&apos;;
 
 /**
  * The error types that cause the {@link SocketEvents} &apos;error&apos; event to fire.
@@ -47,11 +50,10 @@ const nanobus = require(&apos;nanobus&apos;)();
  * @property {string} AUTH_FAILED The client is not granted access to the server.
  * @since 1.0.0
  */
-const SOCKET_ERROR = {
+export const SOCKET_ERROR = {
 	GENERAL: &apos;GENERAL&apos;,
 	TIMEOUT: &apos;TIMEOUT&apos;,
-	NO_ATTEMPTS_LEFT: &apos;NO_ATTEMPTS_LEFT&apos;,
-	AUTH_FAILED: &apos;AUTH_FAILED&apos;
+	NO_ATTEMPTS_LEFT: &apos;NO_ATTEMPTS_LEFT&apos;
 };
 
 /**
@@ -63,7 +65,7 @@ const SOCKET_ERROR = {
  * @property {string} PING_TIMEOUT The ping to the server timed-out. The client will automatically try to reconnect.
  * @since 1.0.0
  */
-const DISCONNECT_REASON = {
+export const DISCONNECT_REASON = {
 	UNKNOWN: &apos;UNKNOWN&apos;,
 	SERVER_DISCONNECT: &apos;SERVER_DISCONNECT&apos;,
 	CLIENT_DISCONNECT: &apos;CLIENT_DISCONNECT&apos;,
@@ -92,7 +94,7 @@ const DISCONNECT_REASON = {
  * @since 1.0.0
  * @emits {connect} emit event when bar.
  */
-class MissionControlClient {
+export class MissionControlClient {
 	/**
 	 * The MissionControlClient constructor.
 	 *
@@ -101,6 +103,10 @@ class MissionControlClient {
 	 * @param {string} authToken - The JWT authentication token that should be used to authenticate.
 	 */
 	constructor(url, authToken) {
+		// URL and auth token are required parameters.
+		if (!url) throw new Error(&apos;You need to pass an URL.&apos;);
+		if (!authToken) throw new Error(&apos;You need to pass an Auth Token.&apos;);
+
 		/**
 		 * The socket.io socket used for the communication.
 		 *
@@ -140,9 +146,37 @@ class MissionControlClient {
 	 * Job of this function is to unify all error events into a shape that makes more sense. See {@link SOCKET_ERROR} for the possible errors.
 	 */
 	_setupSocketHandlers() {
+		// We hijack the on event method to call it again with the &apos;*&apos; event which now gets called on
+		// any event.
+		const socketOnEvent = this.socket.onevent;
+		this.socket.onevent = function(packet) {
+			const args = packet.data || [];
+			socketOnEvent.call(this, packet);
+
+			packet.data = [&apos;*&apos;].concat(args);
+			socketOnEvent.call(this, packet); // additional call for &quot;*&quot; event
+		};
+
+		// This catches all other events and published them to our event bus
+		this.socket.on(&apos;*&apos;, (event, ...args) =&gt; {
+			this.eventBus.emit(event, ...args);
+		});
+
 		// On successful connection
 		this.socket.on(&apos;connect&apos;, () =&gt; {
-			cleanSubscriptions();
+			// While we still have events to subscribe to, do so on connect
+			while (this._subscribeTo.length &gt; 0) {
+				this.socket.emit(&apos;subscribe&apos;, {
+					event: this._subscribeTo.shift()
+				});
+			}
+
+			// While we still have events to unsubscribe from, do so on connect
+			while (this._unsubscribeFrom.length &gt; 0) {
+				this.socket.emit(&apos;unsubscribe&apos;, {
+					event: this._unsubscribeFrom.shift()
+				});
+			}
 
 			this.eventBus.emit(&apos;connect&apos;);
 		});
@@ -270,14 +304,14 @@ class MissionControlClient {
 	subscribe(serverEvent, listener) {
 		this.socket.on(serverEvent, listener);
 
-		if (!(serverEvent in this.subscriptions)) {
+		if (!(serverEvent in this._subscriptions)) {
 			if (this.socket.connected) {
 				this.socket.emit(&apos;subscribe&apos;, {
 					event: serverEvent
 				});
-				this.subscriptions[serverEvent] = 1;
+				this._subscriptions[serverEvent] = 1;
 			} else {
-				this.subscribeTo.push(serverEvent);
+				this._subscribeTo.push(serverEvent);
 			}
 		}
 
@@ -285,17 +319,17 @@ class MissionControlClient {
 			this.socket.removeListener(serverEvent, listener);
 
 			if (this.socket.connected) {
-				this.subscriptions[serverEvent]--;
+				this._subscriptions[serverEvent]--;
 
-				if (this.subscriptions[serverEvent] === 0) {
-					delete this.subscriptions[serverEvent];
+				if (this._subscriptions[serverEvent] === 0) {
+					delete this._subscriptions[serverEvent];
 
 					this.socket.emit(&apos;unsubscribe&apos;, {
 						event: serverEvent
 					});
 				}
 			} else {
-				this.unsubscribeFrom.push(serverEvent);
+				this._unsubscribeFrom.push(serverEvent);
 			}
 		};
 	}
@@ -318,12 +352,6 @@ class MissionControlClient {
 		this.socket.emit(&apos;action&apos;, { action, data });
 	}
 }
-
-module.exports = {
-	MissionControlClient,
-	SOCKET_ERROR,
-	DISCONNECT_REASON
-};
 </code></pre>
 
 </div>

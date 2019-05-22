@@ -37,14 +37,24 @@ client.on('disconnect', reason => {
 });
 
 // Listen to mission control events.
-client.subscribe('action:VIDEO-QUEUE:PUSH', data => { /* ... */ });
-client.subscribe('update:videoQueue', data => { /* ... */ });
+client.subscribe('action:VIDEO-QUEUE:PUSH', data => {
+	/* ... */
+});
+client.subscribe('update:videoQueue', data => {
+	/* ... */
+});
 
 // Run an action
-client.action('NOTIFICATION:CREATE', { /* data *? });
+client.action('NOTIFICATION:CREATE', {
+	/* data */
+});
 ```
 
 _For more examples and usage, please refer to the [Docs][docs]._
+
+## Handling Auth
+
+Auth is done using JSON Web Tokens. Due to a limitation in Socket.io, we can't detect an 'unauthorized' response, as Socket.io simply won't send any responses before we authenticated. Keep that in mind if you run into connection errors as they might be auth-based. Check the Mission Control console, it will tell you if a socket client is unauthorized.
 
 ## Development Setup
 
