@@ -87,10 +87,6 @@ Distributed under the MIT license. See `LICENSE` for more information.
 4. Push to the branch (`git push origin feature/fooBar`)
 5. Create a new Pull Request
 
-## Acknowledgments
-
-Some acknowledgements.
-
 <!-- Markdown link & img dfn's -->
 
 [npm-image]: https://img.shields.io/npm/v/mission-control-client.svg?style=flat-square
