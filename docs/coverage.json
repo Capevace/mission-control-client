@@ -1,0 +1,15 @@
+{
+  "coverage": "87.5%",
+  "expectCount": 16,
+  "actualCount": 14,
+  "files": {
+    "src/MissionControlClient.js": {
+      "expectCount": 16,
+      "actualCount": 14,
+      "undocumentLines": [
+        1,
+        2
+      ]
+    }
+  }
+}

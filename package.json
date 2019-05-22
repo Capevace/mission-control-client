@@ -1,0 +1,36 @@
+{
+  "name": "mission-control-client",
+  "version": "0.0.1",
+  "description": "A client for Node.js and the browser to easily connect and interact with the Mission Control system.",
+  "main": "src/index.js",
+  "scripts": {
+    "docs": "./node_modules/.bin/esdoc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Capevace/mission-control-client.git"
+  },
+  "author": "Lukas Mateffy (@Capevace)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Capevace/mission-control-client/issues"
+  },
+  "homepage": "https://github.com/Capevace/mission-control-client#readme",
+  "dependencies": {
+    "nanobus": "^4.4.0",
+    "socket.io-client": "^2.2.0"
+  },
+  "devDependencies": {
+    "esdoc": "^1.1.0",
+    "esdoc-standard-plugin": "^1.0.0"
+  },
+  "esdoc": {
+    "source": "./src",
+    "destination": "./docs",
+    "plugins": [
+      {
+        "name": "esdoc-standard-plugin"
+      }
+    ]
+  }
+}
