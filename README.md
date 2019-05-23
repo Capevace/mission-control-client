@@ -70,6 +70,9 @@ npm run build
 
 ## Release History
 
+-   1.1.0
+    -   Changed authentication scheme. Client now sends authentication data over secure body packets instead of querystring parameters, which were visible on insecure connections.
+    -   Added `AUTH_INVALID_TOKEN` and `AUTH_TIMEOUT` socket error types.
 -   1.0.0
     -   The first proper release
 
