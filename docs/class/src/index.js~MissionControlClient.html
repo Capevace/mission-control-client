@@ -38,13 +38,13 @@
 </nav>
 
 <div class="content" data-ice="content"><div class="header-notice">
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {MissionControlClient} from &apos;<span><a href="file/src/index.js.html#lineNumber57">mission-control-client/src/index.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {MissionControlClient} from &apos;<span><a href="file/src/index.js.html#lineNumber64">mission-control-client/src/index.js</a></span>&apos;</code></pre></div>
   <span data-ice="access">public</span>
   <span data-ice="kind">class</span>
   
   
   <span data-ice="since">| since 1.0.0</span>
-  <span data-ice="source">| <span><a href="file/src/index.js.html#lineNumber57">source</a></span></span>
+  <span data-ice="source">| <span><a href="file/src/index.js.html#lineNumber64">source</a></span></span>
 </div>
 
 <div class="self-detail detail">
@@ -66,6 +66,8 @@
   
   <div class="description" data-ice="description"><p>The mission control client class.</p>
 <p>You can easily build your own client implementation, this one is just easy to use and has everything you might need.</p>
+<p>The client hides the authentication implementation details from the user, by hijacking the <code>connect</code> event.
+The connect event only gets called after the authentication scheme is successful.</p>
 </div>
   
 
@@ -121,6 +123,35 @@
   <tbody>
   
   <tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/index.js~MissionControlClient.html#instance-member-authToken">authToken</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>The JWT authentication token that is used to authenticate.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
     <td>
       <span class="access" data-ice="access">public</span>
       
@@ -451,7 +482,7 @@ This makes it possible to for example remove inline listeners.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber65">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber71">source</a></span></span>
     </span>
   </h3>
 
@@ -459,7 +490,6 @@ This makes it possible to for example remove inline listeners.</p>
   
   
   <div data-ice="description"><p>The MissionControlClient constructor.</p>
-<p>You can easily build your own client implementation, this one is just easy to use and has everything you might need.</p>
 </div>
 
   
@@ -512,6 +542,50 @@ This makes it possible to for example remove inline listeners.</p>
 <div data-ice="memberDetails"><h2 data-ice="title">Public Members</h2>
 
 <div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-member-authToken">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">authToken</span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber80">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  <div data-ice="description"><p>The JWT authentication token that is used to authenticate.</p>
+</div>
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
   <h3 data-ice="anchor" id="instance-member-eventBus">
     <span class="access" data-ice="access">public</span>
     
@@ -523,7 +597,7 @@ This makes it possible to for example remove inline listeners.</p>
     <span class="right-info">
       
       <span class="since" data-ice="since">since 1.0.0</span>
-      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber91">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber101">source</a></span></span>
     </span>
   </h3>
 
@@ -579,7 +653,7 @@ This makes it possible to for example remove inline listeners.</p>
     <span class="right-info">
       
       <span class="since" data-ice="since">since 1.0.0</span>
-      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber78">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber90">source</a></span></span>
     </span>
   </h3>
 
@@ -626,7 +700,7 @@ This makes it possible to for example remove inline listeners.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber96">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber106">source</a></span></span>
     </span>
   </h3>
 
@@ -669,7 +743,7 @@ This makes it possible to for example remove inline listeners.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber94">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber104">source</a></span></span>
     </span>
   </h3>
 
@@ -712,7 +786,7 @@ This makes it possible to for example remove inline listeners.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber98">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber108">source</a></span></span>
     </span>
   </h3>
 
@@ -758,7 +832,7 @@ This makes it possible to for example remove inline listeners.</p>
     <span class="right-info">
       
       <span class="since" data-ice="since">since 1.0.0</span>
-      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber311">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber351">source</a></span></span>
     </span>
   </h3>
 
@@ -836,7 +910,7 @@ client.action(&apos;VIDEO-QUEUE:PUSH&apos;, { video: { url: &apos;...&apos;, for
     <span class="right-info">
       
       <span class="since" data-ice="since">since 1.0.0</span>
-      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber219">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber259">source</a></span></span>
     </span>
   </h3>
 
@@ -928,7 +1002,7 @@ on(&apos;error&apos;, (errorType, errorObject) =&gt; {})</code></pre>
     <span class="right-info">
       
       <span class="since" data-ice="since">since 1.0.0</span>
-      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber240">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber280">source</a></span></span>
     </span>
   </h3>
 
@@ -1019,7 +1093,7 @@ This makes it possible to for example remove inline listeners.</p>
     <span class="right-info">
       
       <span class="since" data-ice="since">since 1.0.0</span>
-      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber264">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber304">source</a></span></span>
     </span>
   </h3>
 
@@ -1115,7 +1189,7 @@ client.subscribe(&apos;update:stateObject&apos;, (data) =&gt; {});</code></pre>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber108">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/index.js.html#lineNumber118">source</a></span></span>
     </span>
   </h3>
 

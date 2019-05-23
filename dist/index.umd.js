@@ -12,14 +12,17 @@
 	 * @property {string} GENERAL A general socket error.
 	 * @property {string} TIMEOUT The ping to the server timed out.
 	 * @property {string} NO_ATTEMPTS_LEFT The client ran out of attempts to reconnect to the server.
-	 * @property {string} AUTH_FAILED The client is not granted access to the server.
+	 * @property {string} AUTH_INVALID_TOKEN The client is not granted access to the server due to the token being invalid.
+	 * @property {string} AUTH_TIMEOUT The client is not granted access to the server because the client took too long to authenticate.
 	 * @since 1.0.0
 	 */
 
 	var SOCKET_ERROR = {
 	  GENERAL: 'GENERAL',
 	  TIMEOUT: 'TIMEOUT',
-	  NO_ATTEMPTS_LEFT: 'NO_ATTEMPTS_LEFT'
+	  NO_ATTEMPTS_LEFT: 'NO_ATTEMPTS_LEFT',
+	  AUTH_INVALID_TOKEN: 'AUTH_INVALID_TOKEN',
+	  AUTH_TIMEOUT: 'AUTH_TIMEOUT'
 	};
 	/**
 	 * The disconnect reason that gets passed along with the {@link SocketEvents} 'disconnect' event.
@@ -41,7 +44,7 @@
 	 * As ESDoc lacks a way to properly document events, this typedef shows all the different events the client might emit.
 	 * The "type" below is the callback argument for the listener.
 	 * @typedef SocketEvents
-	 * @property {void} connect Emitted on a successful connect to the server.
+	 * @property {void} connect Emitted on a successful connect to the server. Called after authentication.
 	 * @property {DISCONNECT_REASON} disconnect Emitted when the client disconnected from the server. The disconnect reason indicates why.
 	 * @property {SOCKET_ERROR, object} error Emitted when the encounters an error. The first argument is the {@link SOCKET_ERROR} object, indicating what the error object might be.
 	 * @property {Number} reconnecting Emitted once the clients starts trying to reconnect to the server. Attempt number passed to the listener.
@@ -56,6 +59,10 @@
 	 * The mission control client class.
 	 *
 	 * You can easily build your own client implementation, this one is just easy to use and has everything you might need.
+	 *
+	 * The client hides the authentication implementation details from the user, by hijacking the `connect` event.
+	 * The connect event only gets called after the authentication scheme is successful.
+	 *
 	 * @since 1.0.0
 	 * @emits {connect} emit event when bar.
 	 */
@@ -65,6 +72,12 @@
 	  if (!url) { throw new Error('You need to pass an URL.'); }
 	  if (!authToken) { throw new Error('You need to pass an Auth Token.'); }
 	  /**
+	   * The JWT authentication token that is used to authenticate.
+	   * @type {string}
+	   */
+
+	  this.authToken = authToken;
+	  /**
 	   * The socket.io socket used for the communication.
 	   *
 	   * While it is possible it is recommended not to use this variable directly and to use the exposed {@link MissionControlClient#action} and {@link MissionControlClient#subscribe} methods instead.
@@ -73,11 +86,7 @@
 	   * @since 1.0.0
 	   */
 
-	  this.socket = socketIO(url, {
-	    query: {
-	      token: authToken
-	    }
-	  });
+	  this.socket = socketIO(url);
 	  /**
 	   * The event bus used to communicate events within the client.
 	   *
@@ -128,10 +137,20 @@
 
 	      var args = [], len = arguments.length - 1;
 	      while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
-	    (ref = this$1.eventBus).emit.apply(ref, [ event ].concat( args ));
-	  }); // On successful connection
+	    // Here we only pass the event to our event bus if the events arent our
+	    // own SocketEvents. If we wouldnt do this it would cause a collision
+	    // where listeners would fire twice: once for the actual socket emit and once
+	    // for our event bus. This bypasses this.
+	    if (!['connect', 'disconnect', 'reconnecting', 'error'].includes(event)) { (ref = this$1.eventBus).emit.apply(ref, [ event ].concat( args )); }
+	  }); // On connection we try to authenticate
 
 	  this.socket.on('connect', function () {
+	    this$1.socket.emit('authenticate', {
+	      token: this$1.authToken
+	    });
+	  }); // On successful connection & authentication
+
+	  this.socket.on('authenticated', function () {
 	    // While we still have events to subscribe to, do so on connect
 	    while (this$1._subscribeTo.length > 0) {
 	      this$1.socket.emit('subscribe', {
@@ -144,7 +163,10 @@
 	      this$1.socket.emit('unsubscribe', {
 	        event: this$1._unsubscribeFrom.shift()
 	      });
-	    }
+	    } // We simplify the event structure here, by emitting a 'connect' event rather than a 'authenticated' event.
+	    // This essentially hides the implementation details of the authentication flow from the client user
+	    // which is what we're aiming for by making the client simple.
+
 
 	    this$1.eventBus.emit('connect');
 	  }); // On disconnect from server, reason can either be server disconnect, client disconnect or ping timeout.
@@ -196,6 +218,12 @@
 
 	  this.socket.on('connect_timeout', function (timeout) {
 	    this$1.eventBus.emit('error', SOCKET_ERROR.TIMEOUT, timeout);
+	  }); // Called when we can't authenticate because of an invalid auth token or because
+	  // the client took too long to authenticate.
+
+	  this.socket.on('unauthorized', function (error) {
+	    var authErrorType = error.type === 'TIMEOUT' ? SOCKET_ERROR.AUTH_TIMEOUT : SOCKET_ERROR.AUTH_INVALID_TOKEN;
+	    this$1.eventBus.emit('error', authErrorType, error);
 	  }); // On reconnect error, dont know if needed for now
 	  // this.socket.on('reconnect_error', error => {});
 	  // On reconnection failed, fired becayse we run out of attempts

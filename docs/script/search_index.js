@@ -336,6 +336,12 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "src/index.js~missioncontrolclient#authtoken",
+    "class/src/index.js~MissionControlClient.html#instance-member-authToken",
+    "src/index.js~MissionControlClient#authToken",
+    "member"
+  ],
+  [
     "src/index.js~missioncontrolclient#constructor",
     "class/src/index.js~MissionControlClient.html#instance-constructor-constructor",
     "src/index.js~MissionControlClient#constructor",
