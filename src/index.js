@@ -89,7 +89,9 @@ export class MissionControlClient {
 		 * @type socket.io-client~Socket
 		 * @since 1.0.0
 		 */
-		this.socket = socketIO(url);
+		this.socket = socketIO(url, {
+			path: '/api/socket.io'
+		});
 
 		/**
 		 * The event bus used to communicate events within the client.
